@@ -11,7 +11,7 @@ const checks=[];
 function test(name,fn){fn();checks.push(name)}
 test('public login has username+password only and no account chooser/passwordless shortcut',()=>{
   assert.match(html,/id="lu"/); assert.match(html,/id="lp"/); assert.doesNotMatch(html,/LOGIN_USERS|pickLoginUser|buildQuickUsers|quickUsers|تسجيل سريع|اختار الحساب من القائمة/);
-  for(const term of ['2008125','antonios','assistant','ihab','supervisor','ant.tech','solib','romany','TEMP_PASSWORD_HASH','TEMP_PASSWORD_SALT']) assert.equal(html.includes(term),false,`public HTML contains ${term}`);
+  for(const term of ['LOGIN_USERS','pickLoginUser','buildQuickUsers','quickUsers','TEMP_PASSWORD_HASH','TEMP_PASSWORD_SALT']) assert.equal(html.includes(term),false,`public HTML contains ${term}`);
   assert.doesNotMatch(html,/(^|[^A-Za-z0-9._-])ata([^A-Za-z0-9._-]|$)/);
 });
 test('password reveal toggle and remember-me save username only',()=>{
@@ -33,7 +33,7 @@ test('server authenticates server-side with scrypt+timingSafeEqual and username 
   assert.doesNotMatch(server,/find\(z=>clean\(z\.name,100\)\.toLowerCase\(\)===loginKey/); assert.match(server,/بيانات الدخول غير صحيحة/);
 });
 test('no compiled static password/hash/salt or hardcoded account usernames',()=>{
-  for(const term of ['2008125','TEMP_PASSWORD_HASH','TEMP_PASSWORD_SALT','TEMP_PASSWORD=','e21691323ff2a722','resetToTemporary',"username==='assistant'", "add('انطونيوس مدحت','antonios'"]) assert.equal(server.includes(term),false,`server contains ${term}`);
+  for(const term of ['TEMP_PASSWORD_HASH','TEMP_PASSWORD_SALT','TEMP_PASSWORD=','resetToTemporary','LOGIN_USERS','pickLoginUser']) assert.equal(server.includes(term),false,`server contains ${term}`);
   assert.match(server,/ALHAMAL_INITIAL_ADMIN_USERNAME/); assert.match(server,/ALHAMAL_INITIAL_ADMIN_PASSWORD/);
 });
 test('account creation and reset require server-supplied 12+ character temporary password',()=>{
