@@ -1,0 +1,43 @@
+{
+  "version": "10.6.1",
+  "htmlUtf8Bytes": 179162,
+  "htmlChunkCount": 9,
+  "serverUtf8Bytes": 60027,
+  "serverChunkCount": 4,
+  "publicCredentialSearch": {
+    "2008125": 0,
+    "LOGIN_USERS": 0,
+    "pickLoginUser": 0,
+    "buildQuickUsers": 0,
+    "quickUsers": 0,
+    "antonios": 0,
+    "assistant": 0,
+    "ihab": 0,
+    "supervisor": 0,
+    "ant.tech": 0,
+    "solib": 0,
+    "romany": 0,
+    "TEMP_PASSWORD_HASH": 0,
+    "TEMP_PASSWORD_SALT": 0
+  },
+  "serverCredentialSearch": {
+    "2008125": 0,
+    "TEMP_PASSWORD_HASH": 0,
+    "TEMP_PASSWORD_SALT": 0,
+    "TEMP_PASSWORD=": 0,
+    "e21691323ff2a722": 0,
+    "resetToTemporary": 0
+  },
+  "passwordRotationPolicy": "ALHAMAL_REQUIRE_PASSWORD_ROTATION=true (server-side, one-time after successful login)",
+  "requiresNewPasswordDifferentFromCurrent": true,
+  "automatedSecurityTests": 11,
+  "chromiumMobileWidths": [
+    360,
+    390,
+    412
+  ],
+  "mobileBarButtons": 5,
+  "mobileButtonHeightPx": 56,
+  "moreMenuItemCountInAdminMock": 22,
+  "productionStillAt": "10.6.0 until a new deployment is verified"
+}
