@@ -1,0 +1,24 @@
+{
+  "name": "الحمل الصغير — نظام تشغيل الصيانة",
+  "short_name": "الحمل الصغير",
+  "description": "منصة إدارة وتشغيل الصيانة",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#071224",
+  "theme_color": "#071224",
+  "icons": [
+    {
+      "src": "/brand.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
