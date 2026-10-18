@@ -15,4 +15,36 @@ test('public login has username+password only and no account chooser/passwordles
   assert.doesNotMatch(html,/(^|[^A-Za-z0-9._-])ata([^A-Za-z0-9._-]|$)/);
 });
 test('password reveal toggle and remember-me save username only',()=>{
-  assert.match(html,/toggleLoginPassword\(\)/); assert.match(html,/autocomplete="current-password"/); assert.match(html,/remem���q�^
+  assert.match(html,/toggleLoginPassword\(\)/); assert.match(html,/autocomplete="current-password"/); assert.match(html,/rememberMe/); assert.match(html,/alhamal-remember-username/);
+  assert.match(html,/localStorage\.setItem\('alhamal-remember-username',username\)/);
+  assert.doesNotMatch(html,/localStorage\.setItem\('alhamal-remember-username',[^)]*password/i);
+  assert.doesNotMatch(html,/sessionStorage\.setItem\([^)]*password/i);
+});
+test('generic login error appears in public code',()=>assert.match(html,/بيانات الدخول غير صحيحة/));
+test('all inline browser scripts parse',()=>{const scripts=[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];assert.ok(scripts.length>=1);scripts.forEach((m,i)=>new vm.Script(m[1],{filename:`client-inline-${i}.js`}))});
+test('mobile navigation contains five tabs and More menu; 100dvh/safe-area/touch targets present',()=>{
+  assert.match(html,/aria-label="التنقل الرئيسي"/); assert.match(html,/openMoreMenu\(\)/); assert.match(html,/openMoreSection\(v\)/);
+  for(const label of ['الرئيسية','الأعمال','شراء','الجروب','المزيد']) assert.ok(html.includes(label),`missing mobile label ${label}`);
+  assert.match(html,/100dvh/); assert.match(html,/safe-area-inset-bottom/); assert.match(html,/max-width:620px/); assert.match(html,/max-width:390px/); assert.match(html,/min-height:48px/);
+});
+test('More draws all sections available to the current role',()=>{assert.match(html,/querySelectorAll\('#nav \.nav'\)/);assert.match(html,/x\.style\.display!=='none'/);assert.match(html,/function applyNav\(\)/)});
+test('server authenticates server-side with scrypt+timingSafeEqual and username only',()=>{
+  assert.match(server,/crypto\.scryptSync/); assert.match(server,/crypto\.timingSafeEqual/); assert.match(server,/d\.users\.find\(z=>z\.username\.toLowerCase\(\)===loginKey\)/);
+  assert.doesNotMatch(server,/find\(z=>clean\(z\.name,100\)\.toLowerCase\(\)===loginKey/); assert.match(server,/بيانات الدخول غير صحيحة/);
+});
+test('no compiled static password/hash/salt or hardcoded account usernames',()=>{
+  for(const term of ['2008125','TEMP_PASSWORD_HASH','TEMP_PASSWORD_SALT','TEMP_PASSWORD=','e21691323ff2a722','resetToTemporary',"username==='assistant'", "add('انطونيوس مدحت','antonios'"]) assert.equal(server.includes(term),false,`server contains ${term}`);
+  assert.match(server,/ALHAMAL_INITIAL_ADMIN_USERNAME/); assert.match(server,/ALHAMAL_INITIAL_ADMIN_PASSWORD/);
+});
+test('account creation and reset require server-supplied 12+ character temporary password',()=>{
+  assert.ok(server.includes("const supplied=String(b.password||'')")); assert.match(server,/supplied\.length<12/); assert.match(server,/pw\.length<12/); assert.doesNotMatch(server,/resetToTemporary/);
+});
+test('old auto-reset migrations cannot overwrite passwords at startup',()=>{
+  assert.doesNotMatch(server,/u\.salt=TEMP_PASSWORD/); assert.doesNotMatch(server,/u\.hash=TEMP_PASSWORD/); assert.doesNotMatch(server,/sharedTemporaryPasswordVersion\|\|0\)<3/);
+  assert.match(server,/Never rewrite existing password hashes on startup/);
+});
+test('retired credential forces password change with limited bootstrap',()=>{
+  assert.match(server,/ALHAMAL_RETIRED_PASSWORD_SHA256/); assert.match(server,/ALHAMAL_REQUIRE_PASSWORD_ROTATION/); assert.match(server,/passwordRotationCompletedAt/); assert.match(server,/vp\(pw,me\)/); assert.match(server,/if\(me\.mustChangePassword\)return send\(res,200,\{user:safe\(me\),mustChangePassword:true\}/); assert.match(server,/me\.mustChangePassword&&!\['\/api\/me','\/api\/logout','\/api\/bootstrap'\]/);
+});
+const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));assert.equal(pkg.version,'10.6.1');
+console.log(`PASS ${checks.length} test groups\n- ${checks.join('\n- ')}`);
