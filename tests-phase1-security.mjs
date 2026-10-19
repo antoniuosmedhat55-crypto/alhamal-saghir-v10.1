@@ -7,9 +7,10 @@ const root=path.dirname(new URL(import.meta.url).pathname);
 const readParts=dir=>fs.readdirSync(path.join(root,dir)).filter(n=>n.endsWith('.txt')).sort((a,b)=>Number(a.slice(0,-4))-Number(b.slice(0,-4))).map(n=>fs.readFileSync(path.join(root,dir,n),'utf8')).join('');
 const html=zlib.brotliDecompressSync(Buffer.from(readParts('public/html-chunks'),'base64')).toString('utf8');
 const server=zlib.brotliDecompressSync(Buffer.from(readParts('bundle-chunks'),'base64')).toString('utf8');
+const wrapper=fs.readFileSync(path.join(root,'server.js'),'utf8');
 const checks=[];
 function test(name,fn){fn();checks.push(name)}
-test('public login has username+password only and no account chooser/passwordless shortcut',()=>{
+test('compiled HTML has secure username/password fields and no embedded password shortcut',()=>{
   assert.match(html,/id="lu"/); assert.match(html,/id="lp"/); assert.doesNotMatch(html,/LOGIN_USERS|pickLoginUser|buildQuickUsers|quickUsers|تسجيل سريع|اختار الحساب من القائمة/);
   for(const term of ['LOGIN_USERS','pickLoginUser','buildQuickUsers','quickUsers','TEMP_PASSWORD_HASH','TEMP_PASSWORD_SALT']) assert.equal(html.includes(term),false,`public HTML contains ${term}`);
   assert.doesNotMatch(html,/(^|[^A-Za-z0-9._-])ata([^A-Za-z0-9._-]|$)/);
@@ -46,5 +47,26 @@ test('old auto-reset migrations cannot overwrite passwords at startup',()=>{
 test('retired credential forces password change with limited bootstrap',()=>{
   assert.match(server,/ALHAMAL_RETIRED_PASSWORD_SHA256/); assert.match(server,/ALHAMAL_REQUIRE_PASSWORD_ROTATION/); assert.match(server,/passwordRotationCompletedAt/); assert.match(server,/vp\(pw,me\)/); assert.match(server,/if\(me\.mustChangePassword\)return send\(res,200,\{user:safe\(me\),mustChangePassword:true\}/); assert.match(server,/me\.mustChangePassword&&!\['\/api\/me','\/api\/logout','\/api\/bootstrap'\]/);
 });
-const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));assert.equal(pkg.version,'10.6.1');
+
+test('account selector lists accounts but only fills username and never auto-submits or fills password',()=>{
+  assert.match(wrapper,/alhamalAccountPicker/);
+  for(const user of ['antonios','assistant','ihab','supervisor','ant.tech','solib','ata','romany','georges']) assert.ok(wrapper.includes('value="'+user+'"'),`missing selectable account ${user}`);
+  assert.match(wrapper,/user\.value=this\.value/);
+  assert.doesNotMatch(wrapper,/picker\.addEventListener\(['"]change['"][\s\S]{0,500}(?:lp|password)[\s\S]{0,100}\.value\s*=/i);
+  assert.doesNotMatch(wrapper,/requestSubmit\(|form\.submit\(/);
+});
+test('account role policy leaves Admin with Tony and makes Majed and technician Antonios technicians',()=>{
+  assert.match(wrapper,/majed\.role='فني صيانة'/);
+  assert.match(wrapper,/majed\.secondaryRole=''/);
+  assert.match(wrapper,/adminTony\.role='مدير النظام'/);
+  assert.match(wrapper,/technicianAntonios\.role='فني صيانة'/);
+  assert.match(wrapper,/technicianAntonios\.secondaryRole=''/);
+});
+test('neon motion remains subtle and respects reduced-motion preferences',()=>{
+  assert.match(wrapper,/alhamalIconGlow/);
+  assert.ok(wrapper.includes('replaceAll("10.6.1","10.6.2")'));
+  assert.match(wrapper,/prefers-reduced-motion:reduce/);
+});
+const sw=fs.readFileSync(path.join(root,'public','sw.js'),'utf8');assert.match(sw,/alhamal-v10\.6\.2/);
+const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));assert.equal(pkg.version,'10.6.2');
 console.log(`PASS ${checks.length} test groups\n- ${checks.join('\n- ')}`);
