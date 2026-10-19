@@ -64,7 +64,9 @@ test('account role policy leaves Admin with Tony and makes Majed and technician 
 });
 test('neon motion remains subtle and respects reduced-motion preferences',()=>{
   assert.match(wrapper,/alhamalIconGlow/);
+  assert.match(wrapper,/replaceAll\("10\\.6\\.1","10\\.6\\.2"\)/);
   assert.match(wrapper,/prefers-reduced-motion:reduce/);
 });
+const sw=fs.readFileSync(path.join(root,'public','sw.js'),'utf8');assert.match(sw,/alhamal-v10\.6\.2/);
 const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));assert.equal(pkg.version,'10.6.2');
 console.log(`PASS ${checks.length} test groups\n- ${checks.join('\n- ')}`);
