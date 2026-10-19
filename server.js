@@ -32,6 +32,7 @@ html=html.replace("</body>",accountChoiceScript+"</body>");
 globalThis.__ALHAMAL_HTML=html;
 let bundleSource=zlib.brotliDecompressSync(Buffer.from(readParts(path.join(root,"bundle-chunks")),"base64")).toString("utf8");
 const normalizeHook="function normalize(d){";
+bundleSource=bundleSource.replaceAll("10.6.1","10.6.2");
 if(!bundleSource.includes(normalizeHook))throw new Error("Account role policy insertion point not found");
 const rolePolicy="function normalize(d){if(Array.isArray(d.users)){const users=d.users;const majed=users.find(u=>String(u.username||'').trim().toLowerCase()==='assistant');if(majed){majed.role='فني صيانة';majed.secondaryRole='';}const technicianAntonios=users.find(u=>String(u.username||'').trim().toLowerCase()==='ant.tech');if(technicianAntonios){technicianAntonios.role='فني صيانة';technicianAntonios.secondaryRole='';}const adminTony=users.find(u=>String(u.username||'').trim().toLowerCase()==='antonios');if(adminTony){adminTony.role='مدير النظام';adminTony.secondaryRole='';}}";
 bundleSource=bundleSource.replace(normalizeHook,rolePolicy);
