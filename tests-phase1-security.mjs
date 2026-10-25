@@ -50,23 +50,24 @@ test('retired credential forces password change with limited bootstrap',()=>{
 
 test('account selector lists accounts but only fills username and never auto-submits or fills password',()=>{
   assert.match(wrapper,/alhamalAccountPicker/);
-  for(const user of ['antonios','assistant','ihab','supervisor','ant.tech','solib','ata','romany','georges']) assert.ok(wrapper.includes('value="'+user+'"'),`missing selectable account ${user}`);
+  assert.match(wrapper,/api\/login-options/); assert.match(wrapper,/users:d\.users\.filter\(x=>x\.active\)/);
   assert.match(wrapper,/user\.value=this\.value/);
   assert.doesNotMatch(wrapper,/picker\.addEventListener\(['"]change['"][\s\S]{0,500}(?:lp|password)[\s\S]{0,100}\.value\s*=/i);
   assert.doesNotMatch(wrapper,/requestSubmit\(|form\.submit\(/);
 });
+test('login account selector uses live active accounts and returns no passwords',()=>{assert.match(wrapper,/name:clean\(x\.name,100\),username:clean\(x\.username,60\)/);assert.doesNotMatch(wrapper,/password:clean\(x\.password/)});
 test('account role policy leaves Admin with Tony and makes Majed and technician Antonios technicians',()=>{
   assert.match(wrapper,/majed\.role='فني صيانة'/);
   assert.match(wrapper,/majed\.secondaryRole=''/);
-  assert.match(wrapper,/adminTony\.role='مدير النظام'/);
+  assert.match(wrapper,/adminTony\.role='مدير النظام'/); assert.match(wrapper,/adminTony\.name='توني — أنطونيوس مدحت'/);
   assert.match(wrapper,/technicianAntonios\.role='فني صيانة'/);
   assert.match(wrapper,/technicianAntonios\.secondaryRole=''/);
 });
 test('neon motion remains subtle and respects reduced-motion preferences',()=>{
   assert.match(wrapper,/alhamalIconGlow/);
-  assert.ok(wrapper.includes('replaceAll("10.6.1","10.6.2")'));
+  assert.ok(wrapper.includes('replaceAll("10.6.1","10.6.3")')); assert.match(wrapper,/activeAdmins\.length<=1/); assert.match(wrapper,/accountPolicyVersion/); assert.match(wrapper,/max-width:780px/); assert.match(wrapper,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
   assert.match(wrapper,/prefers-reduced-motion:reduce/);
 });
-const sw=fs.readFileSync(path.join(root,'public','sw.js'),'utf8');assert.match(sw,/alhamal-v10\.6\.2/);
-const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));assert.equal(pkg.version,'10.6.2');
+const sw=fs.readFileSync(path.join(root,'public','sw.js'),'utf8');assert.match(sw,/alhamal-v10\.6\.3/);
+const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));assert.equal(pkg.version,'10.6.3');
 console.log(`PASS ${checks.length} test groups\n- ${checks.join('\n- ')}`);
