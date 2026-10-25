@@ -51,14 +51,19 @@ test('retired credential forces password change with limited bootstrap',()=>{
 test('account picker runtime is inserted after the document script stack, not inside a JS string',()=>{
   assert.ok(wrapper.includes('html.lastIndexOf("</body>")'));
   assert.ok(!wrapper.includes('html.replace("</body>",accountChoiceScript+"</body>")'));
-  const line=wrapper.split('\\n').find(x=>x.startsWith('const accountChoiceScript='));
-  assert.ok(line);
+  const lineStart=wrapper.indexOf('const accountChoiceScript=');
+  const lineEnd=wrapper.indexOf(String.fromCharCode(10),lineStart);
+  assert.ok(lineStart>=0&&lineEnd>lineStart);
+  const line=wrapper.slice(lineStart,lineEnd);
   const literal=line.slice('const accountChoiceScript='.length,line.lastIndexOf(';'));
   const injected=JSON.parse(literal);
-  const match=injected.match(/<script id="alhamal-executive-runtime">([\\s\\S]*?)<\\/script>/);
-  assert.ok(match,'runtime script should be present in the injected block');
-  new vm.Script(match[1],{filename:'alhamal-executive-runtime.js'});
-});
+  const openTag='<script id="alhamal-executive-runtime">';
+  const closeTag='</script>';
+  const tagStart=injected.indexOf(openTag);
+  const tagEnd=injected.indexOf(closeTag,tagStart+openTag.length);
+  assert.ok(tagStart>=0&&tagEnd>tagStart,'runtime script should be present in the injected block');
+  new vm.Script(injected.slice(tagStart+openTag.length,tagEnd),{filename:'alhamal-executive-runtime.js'});
+});;
 test('account selector lists accounts but only fills username and never auto-submits or fills password',()=>{
   assert.match(wrapper,/alhamalAccountPicker/);
   assert.match(wrapper,/api\/login-options/); assert.match(wrapper,/users:d\.users\.filter\(x=>x\.active\)/);
