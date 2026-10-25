@@ -49,8 +49,8 @@ test('retired credential forces password change with limited bootstrap',()=>{
 });
 
 test('account picker runtime is inserted after the document script stack, not inside a JS string',()=>{
-  assert.match(wrapper,/html\.lastIndexOf\("\\<\\/body>"\)/);
-  assert.doesNotMatch(wrapper,/html\.replace\("\\<\\/body>",accountChoiceScript/);
+  assert.ok(wrapper.includes('html.lastIndexOf("</body>")'));
+  assert.ok(!wrapper.includes('html.replace("</body>",accountChoiceScript+"</body>")'));
   const line=wrapper.split('\\n').find(x=>x.startsWith('const accountChoiceScript='));
   assert.ok(line);
   const literal=line.slice('const accountChoiceScript='.length,line.lastIndexOf(';'));
