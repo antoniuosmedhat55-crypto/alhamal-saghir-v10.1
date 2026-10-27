@@ -64,4 +64,11 @@ jobs:
           }
           console.log('Discovered route handlers:', routes.size);
           console.log([...routes].sort().join(String.fromCharCode(10)));
+          for (const route of ['/api/bootstrap', '/api/works/approve', '/api/works', '/api/attendance', '/api/leaves', '/api/water', '/api/login']) {
+            const index = source.indexOf(route);
+            if (index < 0) continue;
+            let excerpt = source.slice(Math.max(0, index - 180), Math.min(source.length, index + 1500));
+            excerpt = excerpt.replace(/((?:password|secret|token|api[_-]?key|service_role|hash|salt)\\s*[:=]\\s*)['"][^'"]{1,180}['"]/gi, '$1"[REDACTED]"');
+            console.log('\\n--- Route source excerpt: ' + route + ' ---\\n' + excerpt);
+          }
           NODE
