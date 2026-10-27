@@ -35,7 +35,7 @@ test("only open attendance entries are auto-closed and the source is recorded", 
   assert.match(server, /row\.date===localDate&&row\.checkIn&&!row\.checkOut/);
   assert.match(server, /row\.autoClosed=true/);
   assert.match(server, /row\.closureSource='vercel_cron_17_cairo'/);
-  assert.match(server, /if\(closed\)await save\(d\)/);
+  assert.match(server, /if\(closed\|\|monthlyCreated\)await save\(d\)/);
 });
 
 test("Vercel cron schedules only weekdays and handles Cairo DST with two daily UTC windows", () => {
