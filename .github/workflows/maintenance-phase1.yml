@@ -34,6 +34,8 @@ jobs:
         run: npm run test:cron
       - name: Test role-scoped bootstrap
         run: npm run test:role-bootstrap
+      - name: Test injected browser runtime
+        run: npm run test:ui-runtime
       - name: Extract compressed source for inspection
         run: npm run source:extract
       - name: Check extracted application bundle syntax
