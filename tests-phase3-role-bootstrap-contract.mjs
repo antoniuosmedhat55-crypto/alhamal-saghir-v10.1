@@ -21,6 +21,9 @@ test("bootstrap response enforces least-privilege views and hides usernames from
   assert.match(server, /attendance:rbIT\?\[\]:attendanceView/);
   assert.match(server, /works:rbIT\|\|rbHR\?\[\]:worksView/);
   assert.match(server, /audit:rbAdmin\|\|rbIT\?d\.audit:\[\]/);
+  assert.match(server, /messages:rbIT\\|\\|rbHR\\?\\[\\]:d\\.messages/);
+  assert.match(server, /water:rbIT\\|\\|rbHR\\?\\[\\]:waterView/);
+  assert.match(server, /locations:rbIT\\|\\|rbHR\\?\\{\\}:d\\.locations/);
 });
 
 test("HR is an explicit leave approval stage after the replacement and before supervision", () => {
