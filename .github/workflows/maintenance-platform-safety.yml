@@ -31,8 +31,6 @@ jobs:
         uses: actions/setup-node@1e60f620b9541d244eee9b237ab6ed19e6ebc66e
         with:
           node-version: '24'
-          cache: npm
-          cache-dependency-path: package.json
 
       - name: Validate server syntax
         run: node --check server.js
