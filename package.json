@@ -1,11 +1,18 @@
 {
   "name": "alhamal-saghir",
-  "version": "10.6.4",
+  "version": "10.6.5",
   "private": true,
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "test:security": "node tests-phase1-security.mjs"
+    "test:security": "node tests-phase1-security.mjs",
+    "source:extract": "node scripts/extract-source.mjs",
+    "test:fault-lifecycle": "node --test tests/fault-lifecycle.test.mjs",
+    "test:authorization": "node --test tests/authorization.test.mjs",
+    "test:attendance": "node tests-phase2-attendance-contract.mjs",
+    "test:cron": "node tests-phase2-cron-contract.mjs",
+    "test:role-bootstrap": "node --test tests-phase3-role-bootstrap-contract.mjs",
+    "test:ui-runtime": "node --test tests-phase4-ui-runtime-contract.mjs"
   },
   "engines": {
     "node": "24.x"

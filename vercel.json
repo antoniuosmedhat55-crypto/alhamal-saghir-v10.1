@@ -17,5 +17,15 @@
       "src": "/(.*)",
       "dest": "server.js"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/attendance-close",
+      "schedule": "0 14 * * 0-4"
+    },
+    {
+      "path": "/api/cron/attendance-close",
+      "schedule": "0 15 * * 0-4"
+    }
   ]
 }

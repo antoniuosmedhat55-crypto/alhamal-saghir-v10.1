@@ -1,0 +1,46 @@
+name: Maintenance phase 1 checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - feature/maintenance-workflows-phase1
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Check server syntax
+        run: node --check server.js
+      - name: Run existing security regression tests
+        run: npm run test:security
+      - name: Test fault lifecycle state machine
+        run: npm run test:fault-lifecycle
+      - name: Test fail-closed role authorization policy
+        run: npm run test:authorization
+      - name: Test server-time attendance contract
+        run: npm run test:attendance
+      - name: Test scheduled auto clock-out contract
+        run: npm run test:cron
+      - name: Test role-scoped bootstrap
+        run: npm run test:role-bootstrap
+      - name: Test injected browser runtime
+        run: npm run test:ui-runtime
+      - name: Extract compressed source for inspection
+        run: npm run source:extract
+      - name: Check extracted application bundle syntax
+        run: node --check .workbench/server-bundle.js
+      - name: Audit backend routes without state data
+        run: node scripts/audit-runtime-routes.mjs
+      - name: Verify extracted HTML has an application shell
+        run: node --input-type=module -e "import fs from 'node:fs'; const html=fs.readFileSync('.workbench/app.html','utf8'); if (!html.includes('<html') || !html.includes('</body>')) throw new Error('Extracted HTML shell is incomplete'); console.log('Extracted HTML shell verified');"
