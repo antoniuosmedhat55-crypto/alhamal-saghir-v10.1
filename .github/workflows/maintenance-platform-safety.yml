@@ -28,9 +28,10 @@ jobs:
           persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@1e60f620b9541d244eee9b237ab6ed19e6ebc66e
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: '24'
+          package-manager-cache: false
 
       - name: Validate server syntax
         run: node --check server.js
