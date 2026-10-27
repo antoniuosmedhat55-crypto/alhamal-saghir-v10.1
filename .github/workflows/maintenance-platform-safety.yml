@@ -49,19 +49,19 @@ jobs:
           import path from 'node:path';
           import zlib from 'node:zlib';
           const readParts = (dir) => fs.readdirSync(dir)
-            .filter((name) => /^\\d+\\.txt$/.test(name))
+            .filter((name) => /^\d+\.txt$/.test(name))
             .sort((a, b) => Number(a.slice(0, -4)) - Number(b.slice(0, -4)))
             .map((name) => fs.readFileSync(path.join(dir, name), 'utf8')).join('');
           const source = zlib.brotliDecompressSync(
             Buffer.from(readParts('bundle-chunks'), 'base64')
           ).toString('utf8');
           const routes = new Set();
-          for (const match of source.matchAll(/if\\(req\\.method===['"]([A-Z]+)['"]&&u\\.pathname===['"]([^'"]+)['"]\\)/g)) {
+          for (const match of source.matchAll(/if\(req\.method===['"]([A-Z]+)['"]&&u\.pathname===['"]([^'"]+)['"]\)/g)) {
             routes.add(match[1] + ' ' + match[2]);
           }
-          for (const match of source.matchAll(/if\\(req\\.method===['"]([A-Z]+)['"]&&u\\.pathname\\.startsWith\\(['"]([^'"]+)['"]\\)\\)/g)) {
+          for (const match of source.matchAll(/if\(req\.method===['"]([A-Z]+)['"]&&u\.pathname\.startsWith\(['"]([^'"]+)['"]\)\)/g)) {
             routes.add(match[1] + ' ' + match[2] + '*');
           }
           console.log('Discovered route handlers:', routes.size);
-          console.log([...routes].sort().join('\\n'));
+          console.log([...routes].sort().join(String.fromCharCode(10)));
           NODE
