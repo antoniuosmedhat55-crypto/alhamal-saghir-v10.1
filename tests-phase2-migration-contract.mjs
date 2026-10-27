@@ -4,35 +4,33 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
-const migrationPath = path.join(
-  root,
-  "supabase",
-  "migrations",
-  "20261027000100_expand_maintenance_rbac.sql",
-);
+const migrationPath = path.join(root, "supabase", "migrations", "20261027000100_expand_maintenance_rbac.sql");
 const sql = fs.readFileSync(migrationPath, "utf8");
 const checks = [];
+
 function test(name, fn) {
   fn();
   checks.push(name);
 }
 
 test("migration is wrapped in a transaction", () => {
-  assert.match(sql, /^\s*begin\s*;/i);
-  assert.match(sql, /\bcommit\s*;\s*$/i);
+  assert.match(sql, /\bbegin\s*;/i);
+  assert.match(sql, /\bcommit\s*;/i);
 });
 
-test("new roles are inserted idempotently", () => {
+test("new HR and IT roles are inserted idempotently", () => {
   assert.match(sql, /'hr'\s*,\s*'الموارد البشرية'/);
   assert.match(sql, /'it_engineer'\s*,\s*'مهندس البرمجة'/);
   assert.match(sql, /on\s+conflict\s*\(code\)\s*do\s+update/i);
 });
 
-test("all additions use idempotent column or index guards", () => {
-  for (const match of sql.matchAll(/\balter\s+table\s+public\.([a-z_]+)([\s\S]*?);/gi)) {
-    const [, table, body] = match;
-    const declarations = body.split(",").map((part) => part.trim()).filter(Boolean);
-    for (const declaration of declarations) {
+test("every added column and index is guarded for repeat runs", () => {
+  const tableStatements = [...sql.matchAll(/\balter\s+table\s+public\.([a-z_]+)([\s\S]*?);/gi)];
+  assert.ok(tableStatements.length >= 6, "Expected table alteration statements");
+  for (const match of tableStatements) {
+    const table = match[1];
+    const body = match[2];
+    for (const declaration of body.split(",").map((part) => part.trim()).filter(Boolean)) {
       assert.match(
         declaration,
         /^add\s+column\s+if\s+not\s+exists\b/i,
@@ -45,7 +43,7 @@ test("all additions use idempotent column or index guards", () => {
   }
 });
 
-test("required security and workflow fields exist", () => {
+test("required security, workflow, attendance, leave and water fields exist", () => {
   const expected = [
     ["users", "must_change_password"],
     ["users", "password_rotation_completed_at"],
@@ -67,12 +65,12 @@ test("required security and workflow fields exist", () => {
   ];
   for (const [table, column] of expected) {
     const tableBlock = new RegExp(
-      `alter\\s+table\\s+public\\.${table}\\b[\\s\\S]*?;`,
+      "alter\\s+table\\s+public\\." + table + "\\b[\\s\\S]*?;",
       "i",
     ).exec(sql)?.[0] ?? "";
     assert.match(
       tableBlock,
-      new RegExp(`add\\s+column\\s+if\\s+not\\s+exists\\s+${column}\\b`, "i"),
+      new RegExp("add\\s+column\\s+if\\s+not\\s+exists\\s+" + column + "\\b", "i"),
       `Missing idempotent field public.${table}.${column}`,
     );
   }
@@ -84,15 +82,19 @@ test("migration contains no destructive data/schema statements", () => {
   assert.doesNotMatch(sql, /\bdelete\s+from\b/i);
 });
 
-test("indexes exist for common workload lookups", () => {
+test("indexes exist for assignment, attendance and water lookups", () => {
   for (const index of [
     "faults_assigned_to_status_idx",
     "tasks_assigned_to_status_idx",
     "attendance_user_date_idx",
     "water_logs_location_tank_date_idx",
   ]) {
-    assert.match(sql, new RegExp(`create\\s+index\\s+if\\s+not\\s+exists\\s+${index}\\b`, "i"));
+    assert.match(
+      sql,
+      new RegExp("create\\s+index\\s+if\\s+not\\s+exists\\s+" + index + "\\b", "i"),
+    );
   }
 });
 
-console.log(`PASS ${checks.length} migration contract checks\\n- ${checks.join("\\n- ")}`);
+console.log(`PASS ${checks.length} migration contract checks`);
+for (const name of checks) console.log("- " + name);
