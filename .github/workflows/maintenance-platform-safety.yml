@@ -42,6 +42,9 @@ jobs:
       - name: Run migration safety contract tests
         run: node tests-phase2-migration-contract.mjs
 
+      - name: Run attendance server-time contract tests
+        run: node tests-phase2-attendance-contract.mjs
+
       - name: Inventory existing backend API surface
         run: |
           node --input-type=module <<'NODE'
@@ -64,17 +67,6 @@ jobs:
           }
           console.log('Discovered route handlers:', routes.size);
           console.log([...routes].sort().join(String.fromCharCode(10)));
-          for (const marker of [
-            "if(req.method==='PATCH'&&u.pathname.startsWith('/api/works/'))",
-            "if(req.method==='POST'&&u.pathname==='/api/works/approve')",
-            "if(req.method==='POST'&&u.pathname==='/api/attendance')",
-            "const WORK=",
-            "const OPS=",
-            "const PRIV="
-          ]) {
-            const index = source.indexOf(marker);
-            if (index >= 0) console.log('\\n--- Handler implementation: ' + marker + ' ---\\n' + source.slice(Math.max(0, index - 120), Math.min(source.length, index + 4200)));
-          }
           for (const route of ['/api/bootstrap', '/api/works/approve', '/api/works', '/api/attendance', '/api/leaves', '/api/water', '/api/login']) {
             const index = source.indexOf(route);
             if (index < 0) continue;
