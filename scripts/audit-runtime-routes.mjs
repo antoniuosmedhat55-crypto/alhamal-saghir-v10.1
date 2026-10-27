@@ -6,6 +6,8 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const bundlePath = path.join(root, ".workbench", "server-bundle.js");
 if (!fs.existsSync(bundlePath)) throw new Error("Run npm run source:extract before this audit.");
 const source = fs.readFileSync(bundlePath, "utf8");
+const htmlPath = path.join(root, ".workbench", "app.html");
+const htmlSource = fs.readFileSync(htmlPath, "utf8");
 const routes = new Map();
 const patterns = [
   /if\(req\.method===['"]([A-Z]+)['"]&&u\.pathname===['"]([^'"]+)['"]\)/g,
@@ -47,7 +49,13 @@ for (const [name, needle, max] of detailRoutes) {
   console.log("\n[DETAIL " + name + "]\n" + snippet);
 }
 
-for (const term of ["function normalize(d){", "function safe(", "async function save(", "function audit(", "appServer", "ALHAMAL_REQUIRE_PASSWORD_ROTATION", "const ROLES=", "const ADM=", "const OPS=", "const PRIV=", "const TECH="]) {
+
+for (const term of ["function applyRole", "function renderNav", "navItems", "role===\\"فني صيانة\\"", "الموارد البشرية", "مهندس تقنية المعلومات", "usersList", "data-role"]) {
+  const index = htmlSource.indexOf(term);
+  console.log("\\n[UI " + term + "] " + (index < 0 ? "not found" : htmlSource.slice(Math.max(0, index - 80), Math.min(htmlSource.length, index + 460)).replace(/\\s+/g, " ").slice(0, 520)));
+}
+
+for (const term of ["function normalize(d){", "function safe(", "async function save(", "function audit(", "appServer", "ALHAMAL_REQUIRE_PASSWORD_ROTATION", "const ROLES=", "const ADM=", "const OPS=", "const PRIV=", "const TECH=", "const LEAVE=", "function performance("]) {
   const index = source.indexOf(term);
   console.log("\n[SYMBOL " + term + "] " + (index < 0 ? "not found" : source.slice(Math.max(0, index - 40), Math.min(source.length, index + 420)).replace(/\s+/g, " ").slice(0, 480)));
 }
