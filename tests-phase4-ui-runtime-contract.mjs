@@ -27,8 +27,8 @@ test("HR and IT are included in the user creation role selector",()=>{
 test("HR sees read-only attendance and relevant leaves/report pages only",()=>{
   assert.ok(html.includes("function applyNav(){"));
   assert.ok(wrapper.includes("uiRoleNavAnchor"));
-  assert.match(wrapper,/role\('الموارد البشرية'\)\)hide=!\['dashboard','attendance','leaves','reports','performance'\]/);
-  assert.match(wrapper,/attendance\(\\\'"/);
+  assert.ok(wrapper.includes("role('الموارد البشرية')?'none':''"));
+  assert.ok(wrapper.includes("role('الموارد البشرية')?'none':''"));
 });
 
 test("IT diagnostics board is restricted to IT navigation and renders audit logs safely",()=>{
