@@ -50,7 +50,7 @@ for (const [name, needle, max] of detailRoutes) {
 }
 
 
-for (const term of ["function applyRole", "function renderNav", "navItems", "role===\\"فني صيانة\\"", "الموارد البشرية", "مهندس تقنية المعلومات", "usersList", "data-role"]) {
+for (const term of ["function applyRole", "function renderNav", "navItems", 'role==="فني صيانة"', "الموارد البشرية", "مهندس تقنية المعلومات", "usersList", "data-role"]) {
   const index = htmlSource.indexOf(term);
   console.log("\\n[UI " + term + "] " + (index < 0 ? "not found" : htmlSource.slice(Math.max(0, index - 80), Math.min(htmlSource.length, index + 460)).replace(/\\s+/g, " ").slice(0, 520)));
 }
