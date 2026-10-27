@@ -78,6 +78,9 @@ console.log("\\n[UI RENDER ADMIN] "+(()=>{const i=htmlSource.indexOf("function r
 
 console.log("\\n[UI NAV BUTTONS] "+[...htmlSource.matchAll(/<[^>]+class="nav"[^>]*>/g)].slice(0,90).map(m=>m[0].slice(0,260)).join(" || "));
 console.log("\\n[UI ROLE OPTIONS] "+[...htmlSource.matchAll(/<option[^>]*>[^<]*/g)].slice(0,100).map(m=>m[0]).join(" || "));
+console.log("\\n[UI NAVS ARRAY] "+(()=>{const i=htmlSource.indexOf("const navs=");return i<0?"missing":htmlSource.slice(i,i+1600)})());
+console.log("\\n[UI RENDER ALL] "+(()=>{const i=htmlSource.indexOf("function renderAll(");return i<0?"missing":htmlSource.slice(i,i+1400)})());
+console.log("\\n[UI API WRAPPER] "+(()=>{const i=htmlSource.indexOf("async function api(");return i<0?"missing":htmlSource.slice(i,i+700)})());
 for (const term of ["function applyRole", "function renderNav", "navItems", 'role==="فني صيانة"', "الموارد البشرية", "مهندس تقنية المعلومات", "usersList", "data-role", "function applyNav()", "function openMoreSection", "function openSection", "currentUser", "user.role", 'id="nav"', "function render(", "function show(", "function init(", "page-attendance", "attendancePage", "function bootstrap("]) {
   const index = htmlSource.indexOf(term);
   console.log("\\n[UI " + term + "] " + (index < 0 ? "not found" : htmlSource.slice(Math.max(0, index - 80), Math.min(htmlSource.length, index + 460)).replace(/\\s+/g, " ").slice(0, 520)));
