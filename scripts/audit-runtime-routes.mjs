@@ -61,6 +61,11 @@ for (const [name, needle, max] of detailRoutes) {
 
 const applyNavAt=htmlSource.indexOf("function applyNav(){");
 console.log("\\n[UI APPLY NAV FULL] "+(applyNavAt<0?"missing":htmlSource.slice(applyNavAt,applyNavAt+2400)));
+console.log("\\n[UI BUILD NAV FULL] "+(()=>{const i=htmlSource.indexOf("function buildNav(){");return i<0?"missing":htmlSource.slice(i,i+2400)})());
+console.log("\\n[UI ROLE FUNCTION] "+(()=>{const i=htmlSource.indexOf("function role(");return i<0?"missing":htmlSource.slice(i,i+650)})());
+console.log("\\n[UI USER FORM] "+(()=>{const i=htmlSource.indexOf("function newUser(");return i<0?"missing":htmlSource.slice(i,i+1400)})());
+console.log("\\n[UI RENDER ADMIN] "+(()=>{const i=htmlSource.indexOf("function renderAdmin(");return i<0?"missing":htmlSource.slice(i,i+1400)})());
+
 console.log("\\n[UI NAV BUTTONS] "+[...htmlSource.matchAll(/<[^>]+class="nav"[^>]*>/g)].slice(0,90).map(m=>m[0].slice(0,260)).join(" || "));
 console.log("\\n[UI ROLE OPTIONS] "+[...htmlSource.matchAll(/<option[^>]*>[^<]*/g)].slice(0,100).map(m=>m[0]).join(" || "));
 for (const term of ["function applyRole", "function renderNav", "navItems", 'role==="فني صيانة"', "الموارد البشرية", "مهندس تقنية المعلومات", "usersList", "data-role", "function applyNav()", "function openMoreSection", "function openSection", "currentUser", "user.role", 'id="nav"', "function render(", "function show(", "function init(", "page-attendance", "attendancePage", "function bootstrap("]) {
