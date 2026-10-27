@@ -24,5 +24,9 @@ jobs:
         run: node --check server.js
       - name: Run existing security regression tests
         run: npm run test:security
-      - name: Verify compressed source can be extracted
+      - name: Extract compressed source for inspection
         run: npm run source:extract
+      - name: Check extracted application bundle syntax
+        run: node --check .workbench/server-bundle.js
+      - name: Verify extracted HTML has an application shell
+        run: node --input-type=module -e "import fs from 'node:fs'; const html=fs.readFileSync('.workbench/app.html','utf8'); if (!html.includes('<html') || !html.includes('</body>')) throw new Error('Extracted HTML shell is incomplete'); console.log('Extracted HTML shell verified');"
