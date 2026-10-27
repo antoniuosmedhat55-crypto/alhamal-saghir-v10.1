@@ -1,0 +1,44 @@
+name: Maintenance Platform Safety Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - main
+      - feature/maintenance-rbac-workflow
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maintenance-safety-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-and-security:
+    name: Source, security, and migration contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@1e60f620b9541d244eee9b237ab6ed19e6ebc66e
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Validate server syntax
+        run: node --check server.js
+
+      - name: Run existing security regression suite
+        run: npm run test:security
+
+      - name: Run migration safety contract tests
+        run: node tests-phase2-migration-contract.mjs
