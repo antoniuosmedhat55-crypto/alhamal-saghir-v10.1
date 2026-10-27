@@ -37,7 +37,8 @@ const detailRoutes = [
   ["work-update", "if(req.method==='PATCH'&&u.pathname.startsWith('/api/works/'))", 3000],
   ["purchase-create", "if(req.method==='POST'&&u.pathname==='/api/purchases')", 1500],
   ["account-create", "if(req.method==='POST'&&u.pathname==='/api/users')", 1600],
-  ["state-load", "const d=await load();", 1000],
+  ["bootstrap-response", "if(req.method==='GET'&&u.pathname==='/api/bootstrap')", 4400],
+  ["state-load", "const d=await load();", 300],
 ];
 for (const [name, needle, max] of detailRoutes) {
   const index = source.indexOf(needle);
@@ -46,7 +47,7 @@ for (const [name, needle, max] of detailRoutes) {
   console.log("\n[DETAIL " + name + "]\n" + snippet);
 }
 
-for (const term of ["function normalize(d){", "function safe(", "async function save(", "function audit(", "appServer", "ALHAMAL_REQUIRE_PASSWORD_ROTATION"]) {
+for (const term of ["function normalize(d){", "function safe(", "async function save(", "function audit(", "appServer", "ALHAMAL_REQUIRE_PASSWORD_ROTATION", "const ROLES=", "const ADM=", "const OPS=", "const PRIV=", "const TECH="]) {
   const index = source.indexOf(term);
   console.log("\n[SYMBOL " + term + "] " + (index < 0 ? "not found" : source.slice(Math.max(0, index - 40), Math.min(source.length, index + 420)).replace(/\s+/g, " ").slice(0, 480)));
 }
