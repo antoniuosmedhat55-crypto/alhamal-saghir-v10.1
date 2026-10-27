@@ -41,12 +41,9 @@ const detailRoutes = [
 ];
 for (const [name, needle, max] of detailRoutes) {
   const index = source.indexOf(needle);
-  if (index < 0) { console.log("\\n[DETAIL " + name + "] not found"); continue; }
-  let snippet = source.slice(index, index + max).replace(/\\s+/g, " ");
-  snippet = snippet
-    .replace(/((?:password|salt|hash|token)[A-Za-z0-9_]*\\s*[:=]\\s*)(['"])[^'"]*\\2/gi, "$1\\"[REDACTED]\\"")
-    .replace(/(ALHAMAL_[A-Z0-9_]+\\s*[:=]\\s*)(['"])[^'"]*\\2/gi, "$1\\"[REDACTED]\\"");
-  console.log("\\n[DETAIL " + name + "]\\n" + snippet);
+  if (index < 0) { console.log("\n[DETAIL " + name + "] not found"); continue; }
+  let snippet = source.slice(index, index + max).replace(/\s+/g, " ");
+  console.log("\n[DETAIL " + name + "]\n" + snippet);
 }
 
 for (const term of ["function normalize(d){", "function safe(", "async function save(", "function audit(", "appServer", "ALHAMAL_REQUIRE_PASSWORD_ROTATION"]) {
