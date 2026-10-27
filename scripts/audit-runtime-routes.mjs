@@ -30,6 +30,25 @@ for (const [route, snippet] of [...routes.entries()].sort(([a], [b]) => a.locale
     .replace(/(password|salt|hash|token)(['"]?\s*[:=]\s*['"])[^'"]+(['"])/gi, "$1$2[REDACTED]$3");
   console.log("\n[" + route + "]\n" + safe.slice(0, 680));
 }
+const detailRoutes = [
+  ["attendance", "if(req.method==='POST'&&u.pathname==='/api/attendance')", 2200],
+  ["leaves-create", "if(req.method==='POST'&&u.pathname==='/api/leaves')", 1700],
+  ["leaves-review", "if(req.method==='PATCH'&&u.pathname.startsWith('/api/leaves/'))", 2600],
+  ["work-update", "if(req.method==='PATCH'&&u.pathname.startsWith('/api/works/'))", 3000],
+  ["purchase-create", "if(req.method==='POST'&&u.pathname==='/api/purchases')", 1500],
+  ["account-create", "if(req.method==='POST'&&u.pathname==='/api/users')", 1600],
+  ["state-load", "const d=await load();", 1000],
+];
+for (const [name, needle, max] of detailRoutes) {
+  const index = source.indexOf(needle);
+  if (index < 0) { console.log("\\n[DETAIL " + name + "] not found"); continue; }
+  let snippet = source.slice(index, index + max).replace(/\\s+/g, " ");
+  snippet = snippet
+    .replace(/((?:password|salt|hash|token)[A-Za-z0-9_]*\\s*[:=]\\s*)(['"])[^'"]*\\2/gi, "$1\\"[REDACTED]\\"")
+    .replace(/(ALHAMAL_[A-Z0-9_]+\\s*[:=]\\s*)(['"])[^'"]*\\2/gi, "$1\\"[REDACTED]\\"");
+  console.log("\\n[DETAIL " + name + "]\\n" + snippet);
+}
+
 for (const term of ["function normalize(d){", "function safe(", "async function save(", "function audit(", "appServer", "ALHAMAL_REQUIRE_PASSWORD_ROTATION"]) {
   const index = source.indexOf(term);
   console.log("\n[SYMBOL " + term + "] " + (index < 0 ? "not found" : source.slice(Math.max(0, index - 40), Math.min(source.length, index + 420)).replace(/\s+/g, " ").slice(0, 480)));
