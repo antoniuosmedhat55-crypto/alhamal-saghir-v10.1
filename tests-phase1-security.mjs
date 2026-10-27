@@ -65,8 +65,8 @@ test('account picker runtime is inserted after the document script stack, not in
   new vm.Script(injected.slice(tagStart+openTag.length,tagEnd),{filename:'alhamal-executive-runtime.js'});
 });;
 test('public login never enumerates accounts or exposes account names',()=>{
-  assert.doesNotMatch(wrapper,/alhamalAccountPicker|api\\/login-options|account-choice|اختيار الحساب/);
-  assert.doesNotMatch(wrapper,/users:d\\.users\\.filter\\(x=>x\\.active\\)/);
+  assert.equal(wrapper.includes("alhamalAccountPicker"),false); assert.equal(wrapper.includes("/api/login-options"),false); assert.equal(wrapper.includes("account-choice"),false); assert.equal(wrapper.includes("اختيار الحساب"),false);
+  assert.equal(wrapper.includes("users:d.users.filter"),false);
   assert.doesNotMatch(wrapper,/quick login|تسجيل سريع/i);
 });
 test('account role policy leaves Admin with Tony and makes Majed and technician Antonios technicians',()=>{
