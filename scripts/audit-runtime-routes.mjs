@@ -50,7 +50,11 @@ for (const [name, needle, max] of detailRoutes) {
 }
 
 
-for (const term of ["function applyRole", "function renderNav", "navItems", 'role==="فني صيانة"', "الموارد البشرية", "مهندس تقنية المعلومات", "usersList", "data-role", "function applyNav()", "function openMoreSection", "function openSection", "currentUser", "user.role", "id=\"nav\"", "function render(", "function show(", "function init(", "page-attendance", "attendancePage", "function bootstrap("]) {
+const applyNavAt=htmlSource.indexOf("function applyNav(){");
+console.log("\\n[UI APPLY NAV FULL] "+(applyNavAt<0?"missing":htmlSource.slice(applyNavAt,applyNavAt+2400)));
+console.log("\\n[UI NAV BUTTONS] "+[...htmlSource.matchAll(/<[^>]+class="nav"[^>]*>/g)].slice(0,90).map(m=>m[0].slice(0,260)).join(" || "));
+console.log("\\n[UI ROLE OPTIONS] "+[...htmlSource.matchAll(/<option[^>]*>[^<]*(?:مدير|فني|الموارد|برمجة|IT)[^<]*<\\/option>/g)].slice(0,40).map(m=>m[0]).join(" || "));
+for (const term of ["function applyRole", "function renderNav", "navItems", 'role==="فني صيانة"', "الموارد البشرية", "مهندس تقنية المعلومات", "usersList", "data-role", "function applyNav()", "function openMoreSection", "function openSection", "currentUser", "user.role", 'id="nav"', "function render(", "function show(", "function init(", "page-attendance", "attendancePage", "function bootstrap("]) {
   const index = htmlSource.indexOf(term);
   console.log("\\n[UI " + term + "] " + (index < 0 ? "not found" : htmlSource.slice(Math.max(0, index - 80), Math.min(htmlSource.length, index + 460)).replace(/\\s+/g, " ").slice(0, 520)));
 }
