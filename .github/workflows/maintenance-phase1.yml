@@ -28,6 +28,10 @@ jobs:
         run: npm run test:fault-lifecycle
       - name: Test fail-closed role authorization policy
         run: npm run test:authorization
+      - name: Test server-time attendance contract
+        run: npm run test:attendance
+      - name: Test scheduled auto clock-out contract
+        run: npm run test:cron
       - name: Extract compressed source for inspection
         run: npm run source:extract
       - name: Check extracted application bundle syntax
