@@ -1,0 +1,77 @@
+name: Maintenance Platform Safety Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - main
+      - feature/maintenance-rbac-workflow
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maintenance-safety-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-and-security:
+    name: Source, security, and migration contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Validate server syntax
+        run: node --check server.js
+
+      - name: Run existing security regression suite
+        run: npm run test:security
+
+      - name: Run migration safety contract tests
+        run: node tests-phase2-migration-contract.mjs
+
+      - name: Run attendance server-time contract tests
+        run: node tests-phase2-attendance-contract.mjs
+
+      - name: Inventory existing backend API surface
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import zlib from 'node:zlib';
+          const readParts = (dir) => fs.readdirSync(dir)
+            .filter((name) => /^\d+\.txt$/.test(name))
+            .sort((a, b) => Number(a.slice(0, -4)) - Number(b.slice(0, -4)))
+            .map((name) => fs.readFileSync(path.join(dir, name), 'utf8')).join('');
+          const source = zlib.brotliDecompressSync(
+            Buffer.from(readParts('bundle-chunks'), 'base64')
+          ).toString('utf8');
+          const routes = new Set();
+          for (const match of source.matchAll(/if\(req\.method===['"]([A-Z]+)['"]&&u\.pathname===['"]([^'"]+)['"]\)/g)) {
+            routes.add(match[1] + ' ' + match[2]);
+          }
+          for (const match of source.matchAll(/if\(req\.method===['"]([A-Z]+)['"]&&u\.pathname\.startsWith\(['"]([^'"]+)['"]\)\)/g)) {
+            routes.add(match[1] + ' ' + match[2] + '*');
+          }
+          console.log('Discovered route handlers:', routes.size);
+          console.log([...routes].sort().join(String.fromCharCode(10)));
+          for (const route of ['/api/bootstrap', '/api/works/approve', '/api/works', '/api/attendance', '/api/leaves', '/api/water', '/api/login']) {
+            const index = source.indexOf(route);
+            if (index < 0) continue;
+            let excerpt = source.slice(Math.max(0, index - 180), Math.min(source.length, index + 1500));
+            excerpt = excerpt.replace(/((?:password|secret|token|api[_-]?key|service_role|hash|salt)\\s*[:=]\\s*)['"][^'"]{1,180}['"]/gi, '$1"[REDACTED]"');
+            console.log('\\n--- Route source excerpt: ' + route + ' ---\\n' + excerpt);
+          }
+          NODE
