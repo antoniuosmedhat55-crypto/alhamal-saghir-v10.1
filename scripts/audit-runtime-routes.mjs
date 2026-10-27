@@ -6,6 +6,15 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const bundlePath = path.join(root, ".workbench", "server-bundle.js");
 if (!fs.existsSync(bundlePath)) throw new Error("Run npm run source:extract before this audit.");
 const source = fs.readFileSync(bundlePath, "utf8");
+const wrapperPath = path.join(root, "server.js");
+const wrapperSource = fs.readFileSync(wrapperPath, "utf8");
+const runtimeAnchors = [...wrapperSource.matchAll(/const (\\w+Anchor)=("(?:\\\\.|[^"\\\\])*");if\\(!bundleSource\\.includes\\(\\1Anchor\\)\\)throw new Error\\("[^"]+"\\);/g)];
+const missingAnchors = runtimeAnchors.filter((match) => {
+  try { return !source.includes(JSON.parse(match[2])); }
+  catch { return true; }
+});
+console.log("runtimePatchAnchors=" + runtimeAnchors.length + " missing=" + missingAnchors.map((m) => m[1]).join(","));
+if (missingAnchors.length) process.exitCode = 1;
 const htmlPath = path.join(root, ".workbench", "app.html");
 const htmlSource = fs.readFileSync(htmlPath, "utf8");
 const routes = new Map();
