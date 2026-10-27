@@ -8,12 +8,24 @@ if (!fs.existsSync(bundlePath)) throw new Error("Run npm run source:extract befo
 const source = fs.readFileSync(bundlePath, "utf8");
 const wrapperPath = path.join(root, "server.js");
 const wrapperSource = fs.readFileSync(wrapperPath, "utf8");
-const runtimeAnchors = [...wrapperSource.matchAll(/const (\\w+Anchor)=("(?:\\\\.|[^"\\\\])*");if\\(!bundleSource\\.includes\\(\\1Anchor\\)\\)throw new Error\\("[^"]+"\\);/g)];
-const missingAnchors = runtimeAnchors.filter((match) => {
-  try { return !source.includes(JSON.parse(match[2])); }
-  catch { return true; }
-});
-console.log("runtimePatchAnchors=" + runtimeAnchors.length + " missing=" + missingAnchors.map((m) => m[1]).join(","));
+const wrapperPath = path.join(root, "server.js");
+const wrapperSource = fs.readFileSync(wrapperPath, "utf8");
+const runtimeAnchors = [];
+for (const line of wrapperSource.split("\\n")) {
+  const match = line.match(/^const ([A-Za-z0-9]+Anchor)=/);
+  if (!match || !line.includes("if(!bundleSource.includes(" + match[1] + "))")) continue;
+  const marker = ";if(!bundleSource.includes(" + match[1] + "))";
+  const end = line.indexOf(marker);
+  if (end < 0) continue;
+  try {
+    runtimeAnchors.push({ name: match[1], value: JSON.parse(line.slice(line.indexOf("=") + 1, end)) });
+  } catch {
+    console.log("INVALID_RUNTIME_ANCHOR_LITERAL=" + match[1]);
+    process.exitCode = 1;
+  }
+}
+const missingAnchors = runtimeAnchors.filter((item) => !source.includes(item.value));
+console.log("runtimePatchAnchors=" + runtimeAnchors.length + " missing=" + missingAnchors.map((item) => item.name).join(","));
 if (missingAnchors.length) process.exitCode = 1;
 const htmlPath = path.join(root, ".workbench", "app.html");
 const htmlSource = fs.readFileSync(htmlPath, "utf8");
