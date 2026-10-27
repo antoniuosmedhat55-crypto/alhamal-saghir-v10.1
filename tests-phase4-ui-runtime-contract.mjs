@@ -46,4 +46,22 @@ test("role navigation patch anchors are fail-closed and no public account select
   assert.equal(wrapper.includes("alhamalAccountPicker"),false);
 });
 
-console.log("PASS 5 browser UI/runtime checks");
+test("public HTML removes hard-coded personnel names from visible and hidden views",()=>{
+  const teamAnchor='<div class="muted">المالك الرئيسي: انطونيوس مدحت • المساعد: ماجد • المدير: مهندس إيهاب زكي</div>';
+  const adminAnchor='<div class="muted">المالك: انطونيوس مدحت — مدير النظام وصاحب الصلاحيات الكاملة</div>';
+  assert.ok(html.includes(teamAnchor),"source team label anchor should be reviewed");
+  assert.ok(html.includes(adminAnchor),"source administrator label anchor should be reviewed");
+  assert.ok(wrapper.includes("publicTeamNamesAnchor"));
+  assert.ok(wrapper.includes("publicAdminOwnerAnchor"));
+  let safeHtml=html.replace(teamAnchor,'<div class="muted">إدارة فريق الصيانة والأدوار</div>');
+  safeHtml=safeHtml.replace(adminAnchor,'<div class="muted">إدارة المنصة والأدوار والصلاحيات</div>');
+  safeHtml=safeHtml.replaceAll("المطور: انطونيوس مدحت","فريق تطوير المنصة");
+  assert.equal(safeHtml.includes("انطونيوس مدحت"),false,"personal owner name must not remain in public HTML");
+  assert.equal(safeHtml.includes("مهندس إيهاب زكي"),false,"manager name must not remain in public HTML");
+  assert.equal(safeHtml.includes("ماجد"),false,"assistant name must not remain in public HTML");
+});
+test("wrapper and public assets use hotfix version 10.6.6",()=>{
+  assert.ok(wrapper.includes('html.replaceAll("10.6.4","10.6.6")'));
+  assert.ok(wrapper.includes('replaceAll("10.6.1","10.6.6").replaceAll("10.6.4","10.6.6")'));
+});
+console.log("PASS 7 browser UI/runtime checks");
