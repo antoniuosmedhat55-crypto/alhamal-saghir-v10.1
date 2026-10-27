@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "test:security": "node tests-phase1-security.mjs"
+    "test:security": "node tests-phase1-security.mjs",
+    "source:extract": "node scripts/extract-source.mjs",
+    "test:fault-lifecycle": "node --test tests/fault-lifecycle.test.mjs",
+    "test:authorization": "node --test tests/authorization.test.mjs"
   },
   "engines": {
     "node": "24.x"
