@@ -51,11 +51,11 @@ test('retired credential forces password change with limited bootstrap',()=>{
 test('account picker runtime is inserted after the document script stack, not inside a JS string',()=>{
   assert.ok(wrapper.includes('html.lastIndexOf("</body>")'));
   assert.ok(!wrapper.includes('html.replace("</body>",accountChoiceScript+"</body>")'));
-  const lineStart=wrapper.indexOf('const accountChoiceScript=');
+  const lineStart=wrapper.indexOf('const accountRuntimeScript=');
   const lineEnd=wrapper.indexOf(String.fromCharCode(10),lineStart);
   assert.ok(lineStart>=0&&lineEnd>lineStart);
   const line=wrapper.slice(lineStart,lineEnd);
-  const literal=line.slice('const accountChoiceScript='.length,line.lastIndexOf(';'));
+  const literal=line.slice('const accountRuntimeScript='.length,line.lastIndexOf(';'));
   const injected=JSON.parse(literal);
   const openTag='<script id="alhamal-executive-runtime">';
   const closeTag='</script>';
@@ -64,14 +64,11 @@ test('account picker runtime is inserted after the document script stack, not in
   assert.ok(tagStart>=0&&tagEnd>tagStart,'runtime script should be present in the injected block');
   new vm.Script(injected.slice(tagStart+openTag.length,tagEnd),{filename:'alhamal-executive-runtime.js'});
 });;
-test('account selector lists accounts but only fills username and never auto-submits or fills password',()=>{
-  assert.match(wrapper,/alhamalAccountPicker/);
-  assert.match(wrapper,/api\/login-options/); assert.match(wrapper,/users:d\.users\.filter\(x=>x\.active\)/);
-  assert.match(wrapper,/user\.value=this\.value/);
-  assert.doesNotMatch(wrapper,/picker\.addEventListener\(['"]change['"][\s\S]{0,500}(?:lp|password)[\s\S]{0,100}\.value\s*=/i);
-  assert.doesNotMatch(wrapper,/requestSubmit\(|form\.submit\(/);
+test('public login never enumerates accounts or exposes account names',()=>{
+  assert.doesNotMatch(wrapper,/alhamalAccountPicker|api\\/login-options|account-choice|اختيار الحساب/);
+  assert.doesNotMatch(wrapper,/users:d\\.users\\.filter\\(x=>x\\.active\\)/);
+  assert.doesNotMatch(wrapper,/quick login|تسجيل سريع/i);
 });
-test('login account selector uses live active accounts and returns no passwords',()=>{assert.match(wrapper,/name:clean\(x\.name,100\),username:clean\(x\.username,60\)/);assert.doesNotMatch(wrapper,/password:clean\(x\.password/)});
 test('account role policy leaves Admin with Tony and makes Majed and technician Antonios technicians',()=>{
   assert.match(wrapper,/majed\.role='فني صيانة'/);
   assert.match(wrapper,/majed\.secondaryRole=''/);
@@ -81,9 +78,9 @@ test('account role policy leaves Admin with Tony and makes Majed and technician 
 });
 test('neon motion remains subtle and respects reduced-motion preferences',()=>{
   assert.match(wrapper,/alhamalIconGlow/);
-  assert.ok(wrapper.includes('replaceAll("10.6.1","10.6.4")')); assert.match(wrapper,/activeAdmins\.length<=1/); assert.match(wrapper,/accountPolicyVersion/); assert.match(wrapper,/max-width:780px/); assert.match(wrapper,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+  assert.ok(wrapper.includes('replaceAll("10.6.1","10.6.5")')); assert.match(wrapper,/activeAdmins\.length<=1/); assert.match(wrapper,/accountPolicyVersion/); assert.match(wrapper,/max-width:780px/); assert.match(wrapper,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
   assert.match(wrapper,/prefers-reduced-motion:reduce/);
 });
-const sw=fs.readFileSync(path.join(root,'public','sw.js'),'utf8');assert.match(sw,/alhamal-v10\.6\.4/);
-const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));assert.equal(pkg.version,'10.6.4');
+const sw=fs.readFileSync(path.join(root,'public','sw.js'),'utf8');assert.match(sw,/alhamal-v10\.6\.5/);
+const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));assert.equal(pkg.version,'10.6.5');
 console.log(`PASS ${checks.length} test groups\n- ${checks.join('\n- ')}`);
