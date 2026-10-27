@@ -11,7 +11,8 @@
     "test:authorization": "node --test tests/authorization.test.mjs",
     "test:attendance": "node tests-phase2-attendance-contract.mjs",
     "test:cron": "node tests-phase2-cron-contract.mjs",
-    "test:role-bootstrap": "node --test tests-phase3-role-bootstrap-contract.mjs"
+    "test:role-bootstrap": "node --test tests-phase3-role-bootstrap-contract.mjs",
+    "test:ui-runtime": "node --test tests-phase4-ui-runtime-contract.mjs"
   },
   "engines": {
     "node": "24.x"
