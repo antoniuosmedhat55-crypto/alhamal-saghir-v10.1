@@ -8,10 +8,8 @@ if (!fs.existsSync(bundlePath)) throw new Error("Run npm run source:extract befo
 const source = fs.readFileSync(bundlePath, "utf8");
 const wrapperPath = path.join(root, "server.js");
 const wrapperSource = fs.readFileSync(wrapperPath, "utf8");
-const wrapperPath = path.join(root, "server.js");
-const wrapperSource = fs.readFileSync(wrapperPath, "utf8");
 const runtimeAnchors = [];
-for (const line of wrapperSource.split("\\n")) {
+for (const line of wrapperSource.split(String.fromCharCode(10))) {
   const match = line.match(/^const ([A-Za-z0-9]+Anchor)=/);
   if (!match || !line.includes("if(!bundleSource.includes(" + match[1] + "))")) continue;
   const marker = ";if(!bundleSource.includes(" + match[1] + "))";
