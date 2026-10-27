@@ -32,5 +32,7 @@ jobs:
         run: npm run source:extract
       - name: Check extracted application bundle syntax
         run: node --check .workbench/server-bundle.js
+      - name: Audit backend routes without state data
+        run: node scripts/audit-runtime-routes.mjs
       - name: Verify extracted HTML has an application shell
         run: node --input-type=module -e "import fs from 'node:fs'; const html=fs.readFileSync('.workbench/app.html','utf8'); if (!html.includes('<html') || !html.includes('</body>')) throw new Error('Extracted HTML shell is incomplete'); console.log('Extracted HTML shell verified');"
