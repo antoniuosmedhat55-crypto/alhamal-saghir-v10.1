@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import zlib from "node:zlib";
+import { fileURLToPath } from "node:url";
 
-const root = path.dirname(new URL(import.meta.url).pathname.replace(/^\/(?:([A-Za-z]:))/, "$1"));
+const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const bundlePath = path.join(root, ".workbench", "server-bundle.js");
 if (!fs.existsSync(bundlePath)) throw new Error("Run npm run source:extract before this audit.");
 const source = fs.readFileSync(bundlePath, "utf8");
