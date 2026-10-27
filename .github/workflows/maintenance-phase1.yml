@@ -24,6 +24,8 @@ jobs:
         run: node --check server.js
       - name: Run existing security regression tests
         run: npm run test:security
+      - name: Test fault lifecycle state machine
+        run: npm run test:fault-lifecycle
       - name: Extract compressed source for inspection
         run: npm run source:extract
       - name: Check extracted application bundle syntax
