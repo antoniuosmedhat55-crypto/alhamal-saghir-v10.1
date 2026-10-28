@@ -86,6 +86,34 @@ for (const term of ["function applyRole", "function renderNav", "navItems", 'rol
   console.log("\\n[UI " + term + "] " + (index < 0 ? "not found" : htmlSource.slice(Math.max(0, index - 80), Math.min(htmlSource.length, index + 460)).replace(/\\s+/g, " ").slice(0, 520)));
 }
 
+
+// Login-only diagnostic output: source text only, never persisted state or secrets.
+const loginTargets = [
+  ["POST /api/login", "req.method==='POST'&&u.pathname==='/api/login'", 1900],
+  ["POST /api/logout", "req.method==='POST'&&u.pathname==='/api/logout'", 900],
+  ["POST /api/me password update", "req.method==='PATCH'&&u.pathname==='/api/me'", 1900],
+  ["GET /api/bootstrap", "req.method==='GET'&&u.pathname==='/api/bootstrap'", 1800],
+  ["session guard", "function need(", 1000],
+  ["state loader", "async function load(", 1200],
+  ["state save", "async function save(", 1000],
+  ["password hashing", "crypto.scryptSync(", 650],
+];
+for (const [label, needle, limit] of loginTargets) {
+  let i = source.indexOf(needle);
+  if (i < 0 && label === "POST /api/login") i = source.indexOf("u.pathname==='/api/login'");
+  if (i < 0 && label === "POST /api/me password update") i = source.indexOf("u.pathname==='/api/me'");
+  if (i < 0 && label === "POST /api/logout") i = source.indexOf("u.pathname==='/api/logout'");
+  if (i < 0) { console.log("\\n[LOGIN DIAGNOSTIC " + label + "] NOT FOUND"); continue; }
+  let snippet = source.slice(Math.max(0, i - 180), Math.min(source.length, i + limit)).replace(/\\s+/g, " ");
+  snippet = snippet
+    .replace(/((?:password|passwd|salt|hash|secret|token)[A-Za-z0-9_]*\\s*[:=]\\s*['"])[^'"]*(['"])/gi, "$1[REDACTED]$2")
+    .replace(/((?:password|passwd|salt|hash|secret|token)[A-Za-z0-9_]*\\s*[:=]\\s*)[^,;}]+/gi, "$1[REDACTED]")
+    .replace(/\\b[0-9a-f]{64,}\\b/gi, "[REDACTED_HEX]");
+  console.log("\\n[LOGIN DIAGNOSTIC " + label + "]\\n" + snippet);
+}
+const envNames = [...new Set([...source.matchAll(/process\\.env\\.([A-Z][A-Z0-9_]*)/g)].map(m=>m[1]))].sort();
+console.log("\\n[LOGIN DIAGNOSTIC SERVER ENVIRONMENT VARIABLE NAMES ONLY] " + envNames.join(", "));
+
 for (const term of ["function normalize(d){", "function safe(", "async function save(", "function audit(", "appServer", "ALHAMAL_REQUIRE_PASSWORD_ROTATION", "const ROLES=", "const ADM=", "const OPS=", "const PRIV=", "const TECH=", "const LEAVE=", "function performance("]) {
   const index = source.indexOf(term);
   console.log("\n[SYMBOL " + term + "] " + (index < 0 ? "not found" : source.slice(Math.max(0, index - 40), Math.min(source.length, index + 420)).replace(/\s+/g, " ").slice(0, 480)));
