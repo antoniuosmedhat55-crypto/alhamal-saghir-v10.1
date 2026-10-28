@@ -132,6 +132,14 @@ for (const term of ["async function stateFetch", "function stateFetch", "V9_STAT
 const envNames = [...new Set([...source.matchAll(/process\\.env\\.([A-Z][A-Z0-9_]*)/g)].map(m=>m[1]))].sort();
 console.log("\\n[LOGIN DIAGNOSTIC SERVER ENVIRONMENT VARIABLE NAMES ONLY] " + envNames.join(", "));
 
+
+for (const term of ["function loginAllowed(", "const loginAllowed=", "function clearLoginAttempts(", "const clearLoginAttempts=", "loginAttempts", "failedLogin", "LOGIN_ATTEMPTS", "MAX_LOGIN_ATTEMPTS", "loginAllowed(key)"]) {
+  let i = source.indexOf(term);
+  if (i < 0) continue;
+  const snippet = source.slice(Math.max(0,i-160),Math.min(source.length,i+1050)).replace(/\\s+/g," ");
+  console.log("\\n[LOGIN LIMITER DIAGNOSTIC " + term + "]\\n" + snippet);
+}
+
 for (const term of ["function normalize(d){", "function safe(", "async function save(", "function audit(", "appServer", "ALHAMAL_REQUIRE_PASSWORD_ROTATION", "const ROLES=", "const ADM=", "const OPS=", "const PRIV=", "const TECH=", "const LEAVE=", "function performance("]) {
   const index = source.indexOf(term);
   console.log("\n[SYMBOL " + term + "] " + (index < 0 ? "not found" : source.slice(Math.max(0, index - 40), Math.min(source.length, index + 420)).replace(/\s+/g, " ").slice(0, 480)));
