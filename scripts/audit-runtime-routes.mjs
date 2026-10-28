@@ -111,6 +111,24 @@ for (const [label, needle, limit] of loginTargets) {
     .replace(/\\b[0-9a-f]{64,}\\b/gi, "[REDACTED_HEX]");
   console.log("\\n[LOGIN DIAGNOSTIC " + label + "]\\n" + snippet);
 }
+
+const loginUiTerms = [
+  "function login(", "async function login(", "function submitLogin(", "async function submitLogin(",
+  "function doLogin(", "async function doLogin(", "login()", "fetch('/api/login'", "fetch(\"/api/login\"",
+  "/api/login", "id=\\\"lu\\\"", "id=\\\"lp\\\"", "toggleLoginPassword"
+];
+for (const term of loginUiTerms) {
+  const i = htmlSource.indexOf(term);
+  if (i < 0) continue;
+  let snippet = htmlSource.slice(Math.max(0,i-160), Math.min(htmlSource.length,i+950)).replace(/\\s+/g," ");
+  snippet = snippet.replace(/((?:password|passwd|salt|hash|secret|token)[A-Za-z0-9_]*\\s*[:=]\\s*['"])[^'"]*(['"])/gi,"$1[REDACTED]$2");
+  console.log("\\n[LOGIN UI DIAGNOSTIC " + term + "]\\n" + snippet);
+}
+for (const term of ["async function stateFetch", "function stateFetch", "V9_STATE_URL", "V9_STATE_SECRET", "SESSION_SECRET", "const IS_PROD="]) {
+  const i = source.indexOf(term);
+  if (i >= 0) console.log("\\n[STATE CONFIG " + term + "]\\n" + source.slice(Math.max(0,i-120),Math.min(source.length,i+700)).replace(/\\s+/g," "));
+}
+
 const envNames = [...new Set([...source.matchAll(/process\\.env\\.([A-Z][A-Z0-9_]*)/g)].map(m=>m[1]))].sort();
 console.log("\\n[LOGIN DIAGNOSTIC SERVER ENVIRONMENT VARIABLE NAMES ONLY] " + envNames.join(", "));
 
