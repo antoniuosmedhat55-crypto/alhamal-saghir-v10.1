@@ -78,9 +78,9 @@ test('account role policy leaves Admin with Tony and makes Majed and technician 
 });
 test('neon motion remains subtle and respects reduced-motion preferences',()=>{
   assert.match(wrapper,/alhamalIconGlow/);
-  assert.ok(wrapper.includes('replaceAll("10.6.1","10.7.0")')); assert.match(wrapper,/activeAdmins\.length<=1/); assert.match(wrapper,/accountPolicyVersion/); assert.match(wrapper,/max-width:780px/); assert.match(wrapper,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/); assert.ok(wrapper.includes('const mobileFinalStyles')); assert.ok(wrapper.includes('const editRoleOptionsAnchor=')); assert.ok(wrapper.includes('const locationEditorScript=')); assert.ok(wrapper.includes('const locationUpdateRoute='));
+  assert.ok(wrapper.includes('replaceAll("10.6.1","10.8.0")')); assert.match(wrapper,/activeAdmins\.length<=1/); assert.match(wrapper,/accountPolicyVersion/); assert.match(wrapper,/max-width:780px/); assert.match(wrapper,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/); assert.ok(wrapper.includes('const mobileFinalStyles')); assert.ok(wrapper.includes('const editRoleOptionsAnchor=')); assert.ok(wrapper.includes('const locationEditorScript=')); assert.ok(wrapper.includes('const locationUpdateRoute='));
   assert.match(wrapper,/prefers-reduced-motion:reduce/);
 });
-const sw=fs.readFileSync(path.join(root,'public','sw.js'),'utf8');assert.match(sw,/alhamal-v10\.7\.0/);
-const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));assert.equal(pkg.version,'10.7.0');
+const sw=fs.readFileSync(path.join(root,'public','sw.js'),'utf8');assert.match(sw,/alhamal-v10\.8\.0/);
+const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));assert.equal(pkg.version,'10.8.0');
 console.log(`PASS ${checks.length} test groups\n- ${checks.join('\n- ')}`);

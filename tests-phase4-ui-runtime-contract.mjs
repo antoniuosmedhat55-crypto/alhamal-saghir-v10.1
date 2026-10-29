@@ -60,8 +60,8 @@ test("public HTML removes hard-coded personnel names from visible and hidden vie
   assert.equal(safeHtml.includes("مهندس إيهاب زكي"),false,"manager name must not remain in public HTML");
   assert.equal(safeHtml.includes("ماجد"),false,"assistant name must not remain in public HTML");
 });
-test("wrapper and public assets use hotfix version 10.7.0",()=>{
-  assert.ok(wrapper.includes('html.replaceAll("10.6.4","10.7.0")'));
-  assert.ok(wrapper.includes('replaceAll("10.6.1","10.7.0").replaceAll("10.6.4","10.7.0")'));
+test("wrapper and public assets use hotfix version 10.8.0",()=>{
+  assert.ok(wrapper.includes('html.replaceAll("10.6.4","10.8.0")'));
+  assert.ok(wrapper.includes('replaceAll("10.6.1","10.8.0").replaceAll("10.6.4","10.8.0")'));
 });
 console.log("PASS 7 browser UI/runtime checks");
