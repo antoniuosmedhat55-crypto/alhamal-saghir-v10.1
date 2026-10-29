@@ -1,6 +1,6 @@
 {
   "name": "alhamal-saghir",
-  "version": "10.6.6",
+  "version": "10.6.7",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,9 @@
     "test:attendance": "node tests-phase2-attendance-contract.mjs",
     "test:cron": "node tests-phase2-cron-contract.mjs",
     "test:role-bootstrap": "node --test tests-phase3-role-bootstrap-contract.mjs",
-    "test:ui-runtime": "node --test tests-phase4-ui-runtime-contract.mjs"
+    "test:ui-runtime": "node --test tests-phase4-ui-runtime-contract.mjs",
+    "test:monthly-report": "node --test tests-phase5-monthly-report-contract.mjs",
+    "test:runtime-assembly": "node scripts/validate-runtime-assembly.mjs"
   },
   "engines": {
     "node": "24.x"
