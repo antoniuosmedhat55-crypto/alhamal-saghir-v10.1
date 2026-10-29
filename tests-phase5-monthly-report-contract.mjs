@@ -57,7 +57,7 @@ test("monthly report panel is syntactically valid and escapes saved content",()=
   assert.match(body,/monthlyEscape\(report\.summary/);
   assert.match(body,/approvedLeaveWorkdays/);
   assert.match(body,/__monthlyReportWrapped/);
-  assert.equal(sw.includes("alhamal-v10.6.7"),true);
+  assert.equal(sw.includes("alhamal-v10.6.8"),true);
 });
 
 console.log("PASS 5 monthly close, leave-aware ranking and UI contracts");
