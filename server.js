@@ -6,7 +6,7 @@ const root=path.dirname(fileURLToPath(import.meta.url));
 globalThis.__ALHAMAL_DIR=root;
 function readParts(dir){return fs.readdirSync(dir).filter((n)=>/^\d+\.txt$/.test(n)).sort((a,b)=>Number(a.slice(0,-4))-Number(b.slice(0,-4))).map((n)=>fs.readFileSync(path.join(dir,n),"utf8")).join("");}
 let html=zlib.brotliDecompressSync(Buffer.from(readParts(path.join(root,"public","html-chunks")),"base64")).toString("utf8");
-html=html.replaceAll("10.6.4","10.6.8").replaceAll("10.6.5","10.6.8").replaceAll("10.6.6","10.6.8").replaceAll("10.6.7","10.6.8");
+html=html.replaceAll("10.6.4","10.6.9").replaceAll("10.6.5","10.6.9").replaceAll("10.6.6","10.6.9").replaceAll("10.6.7","10.6.9").replaceAll("10.6.8","10.6.9");
 const publicTeamNamesAnchor='<div class="muted">المالك الرئيسي: انطونيوس مدحت • المساعد: ماجد • المدير: مهندس إيهاب زكي</div>';
 if(!html.includes(publicTeamNamesAnchor))throw new Error("Public team names anchor missing");
 html=html.replace(publicTeamNamesAnchor,'<div class="muted">إدارة فريق الصيانة والأدوار</div>');
@@ -16,6 +16,7 @@ html=html.replace(publicAdminOwnerAnchor,'<div class="muted">إدارة المن
 html=html.replaceAll("المطور: انطونيوس مدحت","فريق تطوير المنصة");
 if(html.includes("انطونيوس مدحت")||html.includes("مهندس إيهاب زكي")||html.includes("ماجد"))throw new Error("Public personnel name remains in HTML");
 const accountRoleOptionsAnchor="const roles=role('مدير النظام')?['مدير النظام','مساعد Admin','مدير الصيانة','مشرف الصيانة','فني صيانة']:['مساعد Admin','مدير الصيانة','مشرف الصيانة','فني صيانة'];";if(!html.includes(accountRoleOptionsAnchor))throw new Error("Account role selector anchor missing");html=html.replace(accountRoleOptionsAnchor,"const roles=['مدير النظام','مساعد Admin','مدير الصيانة','مشرف الصيانة','فني صيانة','الموارد البشرية','مهندس تقنية المعلومات'];");
+const editRoleOptionsAnchor="['مدير النظام','مساعد Admin','مدير الصيانة','مشرف الصيانة','فني صيانة'].map(r=>";if(!html.includes(editRoleOptionsAnchor))throw new Error("Account edit role selector anchor missing");html=html.replaceAll(editRoleOptionsAnchor,"['مدير النظام','مساعد Admin','مدير الصيانة','مشرف الصيانة','فني صيانة','الموارد البشرية','مهندس تقنية المعلومات'].map(r=>");
 const uiRoleNavAnchor="if(!priv()&&!role('مساعد Admin')&&['equipment','periodic','attendance','shifts','tools','water','reports','kpis','control'].includes(x.dataset.v))hide=true;x.style.display=hide?'none':'flex'";if(!html.includes(uiRoleNavAnchor))throw new Error("UI role navigation anchor missing");html=html.replace(uiRoleNavAnchor,"if(!priv()&&!role('مساعد Admin')&&['equipment','periodic','attendance','shifts','tools','water','reports','kpis','control'].includes(x.dataset.v))hide=true;if(role('الموارد البشرية'))hide=!['dashboard','attendance','leaves','reports','performance'].includes(x.dataset.v);if(role('مهندس تقنية المعلومات'))hide=!['dashboard','it-system'].includes(x.dataset.v);if(x.dataset.v==='it-system'&&!role('مهندس تقنية المعلومات'))hide=true;document.querySelectorAll('#attendance button[onclick^=\"attendance(\"]').forEach(b=>b.style.display=role('الموارد البشرية')?'none':'');x.style.display=hide?'none':'flex'");
 const accountsViewAnchor='<div id="usersList" class="list"></div>';
 if(!html.includes(accountsViewAnchor))throw new Error("usersList HTML insertion point missing");
@@ -65,7 +66,7 @@ const bodyClose=html.lastIndexOf("</body>");if(bodyClose<0)throw new Error("HTML
 globalThis.__ALHAMAL_HTML=html;
 let bundleSource=zlib.brotliDecompressSync(Buffer.from(readParts(path.join(root,"bundle-chunks")),"base64")).toString("utf8");
 const normalizeHook="function normalize(d){";
-bundleSource=bundleSource.replaceAll("10.6.1","10.6.8").replaceAll("10.6.4","10.6.8").replaceAll("10.6.5","10.6.8").replaceAll("10.6.6","10.6.8").replaceAll("10.6.7","10.6.8");
+bundleSource=bundleSource.replaceAll("10.6.1","10.6.9").replaceAll("10.6.4","10.6.9").replaceAll("10.6.5","10.6.9").replaceAll("10.6.6","10.6.9").replaceAll("10.6.7","10.6.9").replaceAll("10.6.8","10.6.9");
 if(!bundleSource.includes(normalizeHook))throw new Error("Account role policy insertion point not found");
 const rolePolicy="function normalize(d){if(!d.meta||typeof d.meta!=='object')d.meta={};if(Array.isArray(d.users)){const users=d.users;const majed=users.find(u=>String(u.username||'').trim().toLowerCase()==='assistant');if(majed){majed.name='ماجد';majed.role='فني صيانة';majed.secondaryRole='';}const technicianAntonios=users.find(u=>String(u.username||'').trim().toLowerCase()==='ant.tech');if(technicianAntonios){technicianAntonios.name='أنطونيوس';technicianAntonios.role='فني صيانة';technicianAntonios.secondaryRole='';}const adminTony=users.find(u=>String(u.username||'').trim().toLowerCase()==='antonios');if(adminTony){adminTony.name='توني — أنطونيوس مدحت';adminTony.role='مدير النظام';adminTony.secondaryRole='';}if(Number(d.meta.accountPolicyVersion||0)<1){const solib=users.find(u=>String(u.username||'').trim().toLowerCase()==='solib');if(solib){solib.active=false;solib.disabledReason='تم إيقاف الحساب بناءً على طلب المدير';}d.meta.accountPolicyVersion=1;}}";
 bundleSource=bundleSource.replace(normalizeHook,rolePolicy);
